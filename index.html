@@ -8,99 +8,120 @@
 </head>
 <body class="bg-slate-50 min-h-screen p-4 md:p-8 font-sans text-slate-900 leading-relaxed">
     <div class="max-w-3xl mx-auto">
-        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6">
+        
+        <header class="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
                 <h1 class="text-4xl font-black text-slate-800 tracking-tighter italic uppercase">character_<span class="text-blue-600">tweet</span></h1>
-                <p class="text-xs text-slate-400 font-bold uppercase tracking-[0.2em] mt-1">High-Precision Character Content Generator</p>
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-1">Character Content Generator</p>
             </div>
-            <input type="password" id="apiKey" oninput="saveSettings()" placeholder="Gemini API Key" class="w-64 border-b border-slate-300 bg-transparent text-xs p-1 outline-none focus:border-blue-500 font-mono text-right">
+            <input type="password" id="apiKey" oninput="saveSettings()" placeholder="Gemini API Key" class="w-48 border-b border-slate-300 bg-transparent text-xs p-1 outline-none focus:border-blue-500 font-mono text-right transition-all">
         </header>
 
-        <section class="mb-10 bg-slate-900 text-white p-6 rounded-3xl shadow-2xl">
-            <h2 class="text-[10px] font-black mb-4 text-blue-400 uppercase tracking-widest flex items-center gap-2">
-                <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span> System Architecture Setup
-            </h2>
-            <div class="flex flex-col sm:flex-row gap-3">
-                <input type="text" id="setupTheme" placeholder="例：毒舌なエンジニア、詩的な日常家..." class="flex-1 bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                <button onclick="aiSetup()" id="setupBtn" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3 rounded-xl text-sm transition-all active:scale-95 whitespace-nowrap">構成開始</button>
+        <details class="mb-8 group bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+            <summary class="list-none cursor-pointer p-6 flex justify-between items-center group-open:bg-slate-50 transition-all">
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs">1</span>
+                    <h2 class="text-sm font-black uppercase tracking-widest text-slate-600">🧠 キャラクターを設計・調整する</h2>
+                </div>
+                <span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+            
+            <div class="p-6 space-y-8 border-t border-slate-100">
+                <div class="bg-slate-900 text-white p-5 rounded-2xl">
+                    <label class="block text-[10px] font-bold text-blue-400 uppercase mb-3">AIにキャラ設定を任せる</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="setupTheme" placeholder="例：論理的な書評家、お調子者の大学生..." class="flex-1 bg-white/10 border border-white/10 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                        <button onclick="aiSetup()" id="setupBtn" class="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-xl text-sm font-bold transition-all active:scale-95 whitespace-nowrap">構成開始</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">現在のキャラ定義（魂）</label>
+                        <textarea id="persona" oninput="saveSettings()" rows="5" class="w-full border border-slate-100 rounded-xl p-3 text-sm bg-slate-50/50 outline-none focus:ring-2 focus:ring-blue-400 transition-all" placeholder="どんな性格・立場の人か"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">口調サンプル（喋り方）</label>
+                        <textarea id="tone" oninput="saveSettings()" rows="5" class="w-full border border-slate-100 rounded-xl p-3 text-sm bg-slate-50/50 outline-none focus:ring-2 focus:ring-blue-400 transition-all" placeholder="「〜だね」「〜しちゃうよ」など"></textarea>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">出力の追加ルール（禁止事項など）</label>
+                    <input type="text" id="customInstruction" oninput="saveSettings()" placeholder="例：絵文字多め、専門用語は使わない等" class="w-full border border-slate-100 rounded-xl p-3 text-sm bg-slate-50/50 outline-none focus:ring-2 focus:ring-blue-400 transition-all">
+                </div>
+
+                <details>
+                    <summary class="text-[10px] font-bold text-slate-300 cursor-pointer uppercase hover:text-blue-500 list-none mt-4 text-center">生成ロジックを表示（上級者用）</summary>
+                    <textarea id="promptTemplate" oninput="saveSettings()" rows="6" class="mt-3 w-full border border-slate-100 rounded-xl p-3 text-[10px] font-mono bg-slate-900 text-blue-300 outline-none"></textarea>
+                </details>
             </div>
+        </details>
+
+        <section class="bg-white p-8 rounded-[2.5rem] shadow-xl border-2 border-blue-50 space-y-6">
+            <div class="flex items-center justify-between gap-3 mb-2">
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs shadow-lg shadow-blue-200">2</span>
+                    <h2 class="text-sm font-black uppercase tracking-widest text-slate-700">📝 今日のネタを入力する</h2>
+                </div>
+                <select id="length" onchange="saveSettings()" class="text-[10px] font-black bg-blue-50 text-blue-600 px-4 py-2 rounded-full outline-none border-none cursor-pointer hover:bg-blue-100 transition-all">
+                    <option value="10文字以内">10文字</option>
+                    <option value="20文字以内">20文字</option>
+                    <option value="50文字以内">50文字</option>
+                    <option value="70文字以内">70文字</option>
+                    <option value="100文字以内" selected>100文字</option>
+                    <option value="120文字以内">120文字</option>
+                    <option value="150文字以内">150文字</option>
+                </select>
+            </div>
+
+            <div class="space-y-4">
+                <div class="group">
+                    <label class="block text-[10px] font-bold text-slate-400 group-focus-within:text-blue-500 transition-colors uppercase mb-1">① 外部ニュース・記事の内容</label>
+                    <textarea id="newsInput" rows="2" class="w-full border border-slate-200 rounded-2xl p-4 text-sm focus:border-blue-400 outline-none transition-all resize-none bg-slate-50/30" placeholder="URLやニュース本文を貼り付け..."></textarea>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="group">
+                        <label class="block text-[10px] font-bold text-slate-400 group-focus-within:text-green-500 transition-colors uppercase mb-1">② 今の気分・状況</label>
+                        <input type="text" id="personalInput" class="w-full border border-slate-200 rounded-2xl p-4 text-sm focus:border-green-400 outline-none transition-all bg-slate-50/30" placeholder="例：コーヒーが美味い、少し眠い">
+                    </div>
+                    <div class="group">
+                        <label class="block text-[10px] font-bold text-slate-400 group-focus-within:text-purple-500 transition-colors uppercase mb-1">③ 伝えたい内容の芯</label>
+                        <input type="text" id="contentInput" class="w-full border border-slate-200 rounded-2xl p-4 text-sm focus:border-purple-400 outline-none transition-all bg-slate-50/30" placeholder="例：この技術は未来を変えると思う">
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="generateTweet()" id="genBtn" class="w-full bg-slate-900 text-white font-black py-5 rounded-2xl shadow-2xl active:scale-[0.98] transition-all hover:bg-blue-600 tracking-[0.4em] text-sm">GENERATE</button>
         </section>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-5 space-y-6">
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 space-y-5">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b pb-2">Character Engine</h3>
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-500 uppercase mb-2">キャラクター定義</label>
-                        <textarea id="persona" oninput="saveSettings()" rows="4" class="w-full border border-slate-100 rounded-xl p-3 text-sm bg-slate-50/50 outline-none focus:ring-2 focus:ring-blue-400 transition-all" placeholder="AI構成後に自動入力されます"></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-500 uppercase mb-2">口調サンプル</label>
-                        <textarea id="tone" oninput="saveSettings()" rows="4" class="w-full border border-slate-100 rounded-xl p-3 text-sm bg-slate-50/50 outline-none focus:ring-2 focus:ring-blue-400 transition-all" placeholder="例：「〜なのだ」「基本〇〇だ」"></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-500 uppercase mb-2">追加ルール</label>
-                        <input type="text" id="customInstruction" oninput="saveSettings()" placeholder="改行禁止、ハッシュタグ自動生成など" class="w-full border border-slate-100 rounded-xl p-3 text-sm bg-slate-50/50 outline-none focus:ring-2 focus:ring-blue-400 transition-all">
-                    </div>
-                    <details class="group">
-                        <summary class="text-[10px] font-bold text-slate-300 cursor-pointer uppercase hover:text-blue-500 transition list-none">Logic Template (Edit Raw)</summary>
-                        <textarea id="promptTemplate" oninput="saveSettings()" rows="8" class="mt-3 w-full border border-slate-100 rounded-xl p-3 text-[10px] font-mono bg-slate-900 text-blue-300 outline-none"></textarea>
-                    </details>
-                </div>
+        <div id="loader" class="hidden text-center py-10">
+            <div class="inline-flex items-center gap-2 px-6 py-3 bg-white rounded-full shadow-sm border border-slate-100 animate-pulse">
+                <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">Thinking...</span>
             </div>
+        </div>
 
-            <div class="lg:col-span-7 space-y-6">
-                <div class="bg-white p-8 rounded-3xl shadow-xl border-2 border-blue-50 space-y-6">
-                    <div class="flex items-center justify-between gap-4">
-                        <h3 class="text-xs font-black text-blue-500 uppercase tracking-widest">Generation Context</h3>
-                        <select id="length" onchange="saveSettings()" class="flex-1 max-w-[180px] text-[10px] font-bold bg-blue-50 text-blue-600 px-3 py-2 rounded-xl outline-none border-none cursor-pointer">
-                            <option value="10文字以内">10文字（極短）</option>
-                            <option value="20文字以内">20文字（一言）</option>
-                            <option value="50文字以内">50文字（短文）</option>
-                            <option value="70文字以内">70文字（要約）</option>
-                            <option value="100文字以内" selected>100文字（標準）</option>
-                            <option value="120文字以内">120文字（充実）</option>
-                            <option value="150文字以内">150文字（限界）</option>
-                        </select>
-                    </div>
-
-                    <div class="space-y-4">
-                        <textarea id="newsInput" rows="2" class="w-full border border-slate-200 rounded-2xl p-4 text-sm focus:border-blue-400 outline-none transition-all" placeholder="1. ニュース・記事の内容（情報ソース）"></textarea>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <input type="text" id="personalInput" class="w-full border border-slate-200 rounded-2xl p-4 text-sm focus:border-green-400 outline-none transition-all" placeholder="2. 今の気分・状況">
-                            <input type="text" id="contentInput" class="w-full border border-slate-200 rounded-2xl p-4 text-sm focus:border-purple-400 outline-none transition-all" placeholder="3. 伝えたい内容の芯">
-                        </div>
-                    </div>
-
-                    <button onclick="generateTweet()" id="genBtn" class="w-full bg-slate-900 text-white font-black py-5 rounded-2xl shadow-2xl active:scale-[0.98] transition-all hover:bg-blue-600 tracking-widest">GENERATE CONTENT</button>
+        <div id="resultArea" class="hidden space-y-4 mt-8">
+            <div class="bg-white p-8 rounded-[2rem] border border-blue-100 shadow-2xl relative">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Draft Output</span>
+                    <span id="charCount" class="text-[10px] font-mono text-slate-300">0 chars</span>
                 </div>
-
-                <div id="loader" class="hidden text-center py-10">
-                    <div class="animate-spin w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full inline-block"></div>
-                </div>
-
-                <div id="resultArea" class="hidden space-y-4">
-                    <div class="bg-white p-8 rounded-[2rem] border border-blue-100 shadow-2xl relative group">
-                        <div class="flex justify-between items-center mb-4">
-                            <span class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Generated Output</span>
-                            <span id="charCount" class="text-[10px] font-mono text-slate-300">0 chars</span>
-                        </div>
-                        <p id="tweetOutput" class="text-slate-800 text-xl leading-relaxed whitespace-pre-wrap font-medium select-all"></p>
-                    </div>
-                    <button onclick="copyToClipboard()" id="copyBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-5 rounded-2xl shadow-lg shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2">
-                        <span class="uppercase tracking-widest text-sm">Copy to Clipboard</span>
-                    </button>
-                </div>
+                <p id="tweetOutput" class="text-slate-800 text-xl leading-relaxed whitespace-pre-wrap font-medium select-all"></p>
             </div>
+            <button onclick="copyToClipboard()" id="copyBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-5 rounded-2xl shadow-lg shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2">
+                <span class="uppercase tracking-widest text-sm">Copy to Clipboard</span>
+            </button>
         </div>
     </div>
 
     <script>
         const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
-        // --- Persistence ---
         window.onload = () => {
-            const saved = JSON.parse(localStorage.getItem('character_tweet_v1') || '{}');
+            const saved = JSON.parse(localStorage.getItem('character_tweet_v2') || '{}');
             document.getElementById('apiKey').value = saved.apiKey || '';
             document.getElementById('persona').value = saved.persona || '';
             document.getElementById('tone').value = saved.tone || '';
@@ -118,10 +139,9 @@
                 customInstruction: document.getElementById('customInstruction').value,
                 promptTemplate: document.getElementById('promptTemplate').value
             };
-            localStorage.setItem('character_tweet_v1', JSON.stringify(settings));
+            localStorage.setItem('character_tweet_v2', JSON.stringify(settings));
         }
 
-        // --- AI Architect ---
         async function aiSetup() {
             const apiKey = document.getElementById('apiKey').value;
             const theme = document.getElementById('setupTheme').value;
@@ -130,11 +150,14 @@
             const btn = document.getElementById('setupBtn');
             btn.innerText = "CONFIGURING..."; btn.disabled = true;
 
-            const setupPrompt = `あなたはプロンプトデザイナーです。テーマ: "${theme}" のSNS投稿設定をJSON形式のみで作成してください。
+            const setupPrompt = `あなたはプロンプトエンジニアです。
+テーマ: "${theme}" のSNS投稿設定をJSON形式のみで作成してください。
+
+JSONのフォーマット:
 {
   "persona": "キャラ設定文",
-  "tone": "口調の例示",
-  "template": "指示テンプレート。{{persona}}, {{tone}}, {{custom}}, {{length}}, {{news}}, {{personal}}, {{content}} を全て使い、{{length}} の文字数制限を厳密に守らせ、ツイート内容のみを出力するように設計してください。"
+  "tone": "口調の特徴と例示",
+  "template": "指示テンプレート。{{persona}}, {{tone}}, {{custom}}, {{length}}, {{news}}, {{personal}}, {{content}} を全て使用し、出力はツイート内容の1案のみにすること。"
 }`;
 
             try {
@@ -149,17 +172,16 @@
                 document.getElementById('tone').value = config.tone;
                 document.getElementById('promptTemplate').value = config.template;
                 saveSettings();
-                alert('character_tweet のセットアップが完了しました。');
+                alert('キャラクターを構成しました。アコーディオンを閉じて「今日のネタ」を入力してください。');
             } catch (e) { alert('構成失敗: ' + e.message); }
             finally { btn.innerText = "構成開始"; btn.disabled = false; }
         }
 
-        // --- Generation ---
         async function generateTweet() {
             saveSettings();
             const apiKey = document.getElementById('apiKey').value;
             const template = document.getElementById('promptTemplate').value;
-            if (!apiKey || !template) { alert('AI構成を先に実行してください'); return; }
+            if (!apiKey || !template) { alert('先に「キャラクターを設計する」セクションを完了させてください'); return; }
 
             const loader = document.getElementById('loader');
             const resultArea = document.getElementById('resultArea');
@@ -187,11 +209,11 @@
                 document.getElementById('tweetOutput').innerText = output;
                 document.getElementById('charCount').innerText = `${output.length} chars`;
                 resultArea.classList.remove('hidden');
-            } catch (e) { alert('エラー: ' + e.message); }
+                resultArea.scrollIntoView({ behavior: 'smooth' });
+            } catch (e) { alert('生成エラー: ' + e.message); }
             finally { loader.classList.add('hidden'); genBtn.disabled = false; }
         }
 
-        // --- Clipboard ---
         function copyToClipboard() {
             const text = document.getElementById('tweetOutput').innerText;
             const btn = document.getElementById('copyBtn');
@@ -202,7 +224,7 @@
                 setTimeout(() => {
                     btn.classList.replace('bg-green-600', 'bg-blue-600');
                     btn.innerHTML = originalText;
-                }, 2000);
+                }, 1500);
             });
         }
     </script>
