@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>character_tweet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen p-4 md:p-8 font-sans text-slate-900 leading-relaxed">
+    <div class="max-w-3xl mx-auto">
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6">
+            <div>
+                <h1 class="text-4xl font-black text-slate-800 tracking-tighter italic uppercase">character_<span class="text-blue-600">tweet</span></h1>
+                <p class="text-xs text-slate-400 font-bold uppercase tracking-[0.2em] mt-1">High-Precision Character Content Generator</p>
+            </div>
+            <input type="password" id="apiKey" oninput="saveSettings()" placeholder="Gemini API Key" class="w-64 border-b border-slate-300 bg-transparent text-xs p-1 outline-none focus:border-blue-500 font-mono text-right">
+        </header>
+
+        <section class="mb-10 bg-slate-900 text-white p-6 rounded-3xl shadow-2xl">
+            <h2 class="text-[10px] font-black mb-4 text-blue-400 uppercase tracking-widest flex items-center gap-2">
+                <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span> System Architecture Setup
+            </h2>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <input type="text" id="setupTheme" placeholder="例：毒舌なエンジニア、詩的な日常家..." class="flex-1 bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                <button onclick="aiSetup()" id="setupBtn" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3 rounded-xl text-sm transition-all active:scale-95 whitespace-nowrap">構成開始</button>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-5 space-y-6">
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 space-y-5">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b pb-2">Character Engine</h3>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase mb-2">キャラクター定義</label>
+                        <textarea id="persona" oninput="saveSettings()" rows="4" class="w-full border border-slate-100 rounded-xl p-3 text-sm bg-slate-50/50 outline-none focus:ring-2 focus:ring-blue-400 transition-all" placeholder="AI構成後に自動入力されます"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase mb-2">口調サンプル</label>
+                        <textarea id="tone" oninput="saveSettings()" rows="4" class="w-full border border-slate-100 rounded-xl p-3 text-sm bg-slate-50/50 outline-none focus:ring-2 focus:ring-blue-400 transition-all" placeholder="例：「〜なのだ」「基本〇〇だ」"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase mb-2">追加ルール</label>
+                        <input type="text" id="customInstruction" oninput="saveSettings()" placeholder="改行禁止、ハッシュタグ自動生成など" class="w-full border border-slate-100 rounded-xl p-3 text-sm bg-slate-50/50 outline-none focus:ring-2 focus:ring-blue-400 transition-all">
+                    </div>
+                    <details class="group">
+                        <summary class="text-[10px] font-bold text-slate-300 cursor-pointer uppercase hover:text-blue-500 transition list-none">Logic Template (Edit Raw)</summary>
+                        <textarea id="promptTemplate" oninput="saveSettings()" rows="8" class="mt-3 w-full border border-slate-100 rounded-xl p-3 text-[10px] font-mono bg-slate-900 text-blue-300 outline-none"></textarea>
+                    </details>
+                </div>
+            </div>
+
+            <div class="lg:col-span-7 space-y-6">
+                <div class="bg-white p-8 rounded-3xl shadow-xl border-2 border-blue-50 space-y-6">
+                    <div class="flex items-center justify-between gap-4">
+                        <h3 class="text-xs font-black text-blue-500 uppercase tracking-widest">Generation Context</h3>
+                        <select id="length" onchange="saveSettings()" class="flex-1 max-w-[180px] text-[10px] font-bold bg-blue-50 text-blue-600 px-3 py-2 rounded-xl outline-none border-none cursor-pointer">
+                            <option value="10文字以内">10文字（極短）</option>
+                            <option value="20文字以内">20文字（一言）</option>
+                            <option value="50文字以内">50文字（短文）</option>
+                            <option value="70文字以内">70文字（要約）</option>
+                            <option value="100文字以内" selected>100文字（標準）</option>
+                            <option value="120文字以内">120文字（充実）</option>
+                            <option value="150文字以内">150文字（限界）</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-4">
+                        <textarea id="newsInput" rows="2" class="w-full border border-slate-200 rounded-2xl p-4 text-sm focus:border-blue-400 outline-none transition-all" placeholder="1. ニュース・記事の内容（情報ソース）"></textarea>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <input type="text" id="personalInput" class="w-full border border-slate-200 rounded-2xl p-4 text-sm focus:border-green-400 outline-none transition-all" placeholder="2. 今の気分・状況">
+                            <input type="text" id="contentInput" class="w-full border border-slate-200 rounded-2xl p-4 text-sm focus:border-purple-400 outline-none transition-all" placeholder="3. 伝えたい内容の芯">
+                        </div>
+                    </div>
+
+                    <button onclick="generateTweet()" id="genBtn" class="w-full bg-slate-900 text-white font-black py-5 rounded-2xl shadow-2xl active:scale-[0.98] transition-all hover:bg-blue-600 tracking-widest">GENERATE CONTENT</button>
+                </div>
+
+                <div id="loader" class="hidden text-center py-10">
+                    <div class="animate-spin w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full inline-block"></div>
+                </div>
+
+                <div id="resultArea" class="hidden space-y-4">
+                    <div class="bg-white p-8 rounded-[2rem] border border-blue-100 shadow-2xl relative group">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Generated Output</span>
+                            <span id="charCount" class="text-[10px] font-mono text-slate-300">0 chars</span>
+                        </div>
+                        <p id="tweetOutput" class="text-slate-800 text-xl leading-relaxed whitespace-pre-wrap font-medium select-all"></p>
+                    </div>
+                    <button onclick="copyToClipboard()" id="copyBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-5 rounded-2xl shadow-lg shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2">
+                        <span class="uppercase tracking-widest text-sm">Copy to Clipboard</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+
+        // --- Persistence ---
+        window.onload = () => {
+            const saved = JSON.parse(localStorage.getItem('character_tweet_v1') || '{}');
+            document.getElementById('apiKey').value = saved.apiKey || '';
+            document.getElementById('persona').value = saved.persona || '';
+            document.getElementById('tone').value = saved.tone || '';
+            document.getElementById('length').value = saved.length || '100文字以内';
+            document.getElementById('customInstruction').value = saved.customInstruction || '';
+            document.getElementById('promptTemplate').value = saved.promptTemplate || '';
+        };
+
+        function saveSettings() {
+            const settings = {
+                apiKey: document.getElementById('apiKey').value,
+                persona: document.getElementById('persona').value,
+                tone: document.getElementById('tone').value,
+                length: document.getElementById('length').value,
+                customInstruction: document.getElementById('customInstruction').value,
+                promptTemplate: document.getElementById('promptTemplate').value
+            };
+            localStorage.setItem('character_tweet_v1', JSON.stringify(settings));
+        }
+
+        // --- AI Architect ---
+        async function aiSetup() {
+            const apiKey = document.getElementById('apiKey').value;
+            const theme = document.getElementById('setupTheme').value;
+            if (!apiKey || !theme) { alert('APIキーとテーマを入力してください'); return; }
+
+            const btn = document.getElementById('setupBtn');
+            btn.innerText = "CONFIGURING..."; btn.disabled = true;
+
+            const setupPrompt = `あなたはプロンプトデザイナーです。テーマ: "${theme}" のSNS投稿設定をJSON形式のみで作成してください。
+{
+  "persona": "キャラ設定文",
+  "tone": "口調の例示",
+  "template": "指示テンプレート。{{persona}}, {{tone}}, {{custom}}, {{length}}, {{news}}, {{personal}}, {{content}} を全て使い、{{length}} の文字数制限を厳密に守らせ、ツイート内容のみを出力するように設計してください。"
+}`;
+
+            try {
+                const response = await fetch(`${API_URL}?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: setupPrompt }] }] })
+                });
+                const data = await response.json();
+                const config = JSON.parse(data.candidates[0].content.parts[0].text.replace(/```json|```/g, ''));
+                document.getElementById('persona').value = config.persona;
+                document.getElementById('tone').value = config.tone;
+                document.getElementById('promptTemplate').value = config.template;
+                saveSettings();
+                alert('character_tweet のセットアップが完了しました。');
+            } catch (e) { alert('構成失敗: ' + e.message); }
+            finally { btn.innerText = "構成開始"; btn.disabled = false; }
+        }
+
+        // --- Generation ---
+        async function generateTweet() {
+            saveSettings();
+            const apiKey = document.getElementById('apiKey').value;
+            const template = document.getElementById('promptTemplate').value;
+            if (!apiKey || !template) { alert('AI構成を先に実行してください'); return; }
+
+            const loader = document.getElementById('loader');
+            const resultArea = document.getElementById('resultArea');
+            const genBtn = document.getElementById('genBtn');
+
+            const finalPrompt = template
+                .replace(/{{persona}}/g, document.getElementById('persona').value)
+                .replace(/{{tone}}/g, document.getElementById('tone').value)
+                .replace(/{{custom}}/g, document.getElementById('customInstruction').value)
+                .replace(/{{length}}/g, document.getElementById('length').value)
+                .replace(/{{news}}/g, document.getElementById('newsInput').value || '無し')
+                .replace(/{{personal}}/g, document.getElementById('personalInput').value || '無し')
+                .replace(/{{content}}/g, document.getElementById('contentInput').value || '無し');
+
+            loader.classList.remove('hidden'); resultArea.classList.add('hidden'); genBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: finalPrompt }] }] })
+                });
+                const data = await response.json();
+                const output = data.candidates[0].content.parts[0].text.trim().replace(/^"|"$/g, '');
+                document.getElementById('tweetOutput').innerText = output;
+                document.getElementById('charCount').innerText = `${output.length} chars`;
+                resultArea.classList.remove('hidden');
+            } catch (e) { alert('エラー: ' + e.message); }
+            finally { loader.classList.add('hidden'); genBtn.disabled = false; }
+        }
+
+        // --- Clipboard ---
+        function copyToClipboard() {
+            const text = document.getElementById('tweetOutput').innerText;
+            const btn = document.getElementById('copyBtn');
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btn.innerHTML;
+                btn.classList.replace('bg-blue-600', 'bg-green-600');
+                btn.innerText = 'COPIED!';
+                setTimeout(() => {
+                    btn.classList.replace('bg-green-600', 'bg-blue-600');
+                    btn.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
